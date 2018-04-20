@@ -1,5 +1,5 @@
 var fs = require('fs')
-var contentText = fs.readFileSync('../Main.xml', "utf8")
+var contentText = fs.readFileSync('Main.xml', "utf8")
 //解析contenttext
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
