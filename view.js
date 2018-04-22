@@ -59,15 +59,32 @@ exports.View = function ($, id_lu, isRootView, controller) {
         fatherEle = this.$(fatherEle).parent()//view
         let fatherEleID = this.$(fatherEle).attr("id")
         if (typeof (fatherEleID) == "undefined") {
-            this.isRootView = true
             console.log("控件未找到" + this.id_lu)
             //父控件是controller
             return
         }
         let fatherView = this.controller.viewDic[fatherEleID]
         if (typeof (fatherView) == "undefined") {
-            console.log("未收录控件，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
             //父控件类型不在unionClassNameList
+            //当成特殊控件来处理，用key来做父控件名
+            let key = this.$("#" + fatherEleID).attr("key")
+            if (typeof(key) == "undefined") {
+                console.log("未收录控件，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
+                return
+            } else {
+                let grandFatherEle = this.$("#" + fatherEleID).parentsUntil("RECT").last()
+                grandFatherEle = this.$(grandFatherEle).parent()//rect
+                grandFatherEle = this.$(grandFatherEle).parent()//view
+                let grandFatherEleID = this.$(grandFatherEle).attr("id")
+                let grandFatherView = this.controller.viewDic[grandFatherEleID]
+                if (typeof (grandFatherView) == "undefined") {
+                    console.log("层次关系需特殊处理，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
+                    return
+                } else {
+                    //隔代遗传
+                    return grandFatherView.name() + "." + key
+                }
+            }
             return
         }
         return fatherView.name()

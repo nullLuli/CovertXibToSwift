@@ -15,17 +15,14 @@ exports.Controller = function ($, id_control) {
         return elementClass
     }
 
-    this.rootView = function () {
-        //tableViewController
-        //解析出controller root view标签名
-        let tagName = this.$("#" + this.id_lu)[0].tagName
-        let rootViewTagName = tagName.substring(0, tagName.length - 10)
-        console.log(rootViewTagName)
-        let rootView = this.$("#" + this.id_lu).children(rootViewTagName)
-        let rootViewID = this.$(rootView).attr("id")
-        let rootViewObj = ViewModule.View(this.$, rootViewID, true, this)
-        return rootViewObj
-    }
+    //tableViewController
+    //解析出controller root view标签名
+    let tagName = this.$("#" + this.id_lu)[0].tagName
+    let rootViewTagName = tagName.substring(0, tagName.length - 10)
+    let rootView = this.$("#" + this.id_lu).children(rootViewTagName)
+    let rootViewID = this.$(rootView).attr("id")
+
+    this.rootViewID = rootViewID
 
     this.viewNameIndex = 0
 
@@ -37,10 +34,12 @@ exports.Controller = function ($, id_control) {
         let viewList = this.$("#" + this.id_lu).find(upUnionClassName)
         for (let index = 0; index < viewList.length; index++) {
             const element = viewList[index];
-            console.log("遍历子view")
             let elementID = $(element).attr("id")
-            console.log("子view ID:" + elementID)
-            let view = new ViewModule.View($, elementID, false, this)
+            var isRootView = false
+            if (elementID == this.rootViewID()) {
+                isRootView = true
+            }
+            let view = new ViewModule.View($, elementID, isRootView, this)
             viewDic[elementID] = view
         }
     }
