@@ -10,7 +10,7 @@ var $ = require("jquery")(dom.window)
 var viewDic = new Array()
 var viewNameIndex = 0
 
-let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch"]
+let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch","tableViewCell","tableView",]
 for (const index in unionClassNameList) {
     let unionClassName = unionClassNameList[index]
     let eleList = dom.window.document.querySelectorAll(unionClassName)
@@ -26,6 +26,7 @@ for (const key in viewDic) {
     if (viewDic.hasOwnProperty(key)) {
         const element = viewDic[key];
         // console.log(element)
+        console.log("------------------------------")
         element.description()
     }
 }
@@ -53,6 +54,7 @@ function View(id_lu) {
         if (typeof (elementClass) == "undefined") {
             //使用默认class名称
             let tagName = $("#" + this.id_lu)[0].tagName
+            tagName = tagName.toLowerCase()
             tagName = tagName.substring(0, 1).toUpperCase() + tagName.substring(1);
             elementClass = "UI" + tagName
         }
@@ -81,16 +83,23 @@ function View(id_lu) {
         return constraintObjList
     }
 
+    this.isRootView //是否是controller的root view
+
     this.fatherViewName = function () {
         let fatherEle = $("#" + this.id_lu).parentsUntil("RECT").last()
         fatherEle = $(fatherEle).parent()//rect
         fatherEle = $(fatherEle).parent()//view
         let fatherEleID = $(fatherEle).attr("id")
         if (typeof (fatherEleID) == "undefined") {
+            this.isRootView = true
+            console.log("控件未找到" + this.id_lu)
+            //父控件是controller
             return
         }
         let fatherView = viewDic[fatherEleID]
         if (typeof (fatherView) == "undefined") {
+            console.log("未收录控件，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
+            //父控件类型不在unionClassNameList
             return
         }
         return fatherView.name()
@@ -103,21 +112,23 @@ function View(id_lu) {
         } else {
             let initViewString = 'let ' + this.name() + " = " + this.class_lu() + "()"
             console.log(initViewString)
-            if (typeof (this.fatherViewName()) == "undefined") {
-                //重名处理
-                console.log("father view需要特殊处理")
-            } else {
-                let addSubviewString = this.fatherViewName() + ".addsubview(" + this.name() + ")"
-                console.log(addSubviewString)
-                var constraintStrList = new Array()
-                let constraintList = this.constraintList()
-                for (let index = 0; index < constraintList.length; index++) {
-                    if (constraintList.hasOwnProperty(index)) {
-                        const element = constraintList[index];
-                        let constraintStr = element.description()
-                        constraintStrList.push(constraintStr)
-                        console.log(constraintStr)
-                    }
+            if (this.isRootView == false) {
+                if (typeof (this.fatherViewName()) == "undefined") {
+                    //重名处理
+                    console.log("father view需要特殊处理")
+                } else {
+                    let addSubviewString = this.fatherViewName() + ".addsubview(" + this.name() + ")"
+                    console.log(addSubviewString)
+                }
+            }
+            var constraintStrList = new Array()
+            let constraintList = this.constraintList()
+            for (let index = 0; index < constraintList.length; index++) {
+                if (constraintList.hasOwnProperty(index)) {
+                    const element = constraintList[index];
+                    let constraintStr = element.description()
+                    constraintStrList.push(constraintStr)
+                    console.log(constraintStr)
                 }
             }
         }
@@ -149,9 +160,9 @@ function Constraint_lu(id_constraint) {
             let secondName = viewDic[this.secondItemID].name()
             let des = firstName + '.' + this.firstAttribute + "Anchor.constraint(equalTo:" + secondName + "." + this.secondAttribute + "Anchor"
             if (typeof(this.constant) == "undefined") {
-                des = des + ", constant: " + this.constant + ")"
-            } else {
                 des = des + ")"
+            } else {
+                des = des + ", constant: " + this.constant + ")"
             }
             des = des + ".isActive = true"
             return des
