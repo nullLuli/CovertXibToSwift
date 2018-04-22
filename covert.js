@@ -39,8 +39,7 @@ function View(id_lu) {
         let elementName = $(selectNameString).attr("property")
         if (typeof (elementName) == "undefined") {
             //重名处理
-            if (this.nameIndex == 0)
-            {
+            if (this.nameIndex == 0) {
                 this.nameIndex = viewNameIndex + 1
                 viewNameIndex = this.nameIndex
             }
@@ -83,7 +82,9 @@ function View(id_lu) {
     }
 
     this.fatherViewName = function () {
-        let fatherEle = $("#" + this.id_lu).parent()
+        let fatherEle = $("#" + this.id_lu).parentsUntil("RECT").last()
+        fatherEle = $(fatherEle).parent()//rect
+        fatherEle = $(fatherEle).parent()//view
         let fatherEleID = $(fatherEle).attr("id")
         if (typeof (fatherEleID) == "undefined") {
             return
@@ -111,10 +112,12 @@ function View(id_lu) {
                 var constraintStrList = new Array()
                 let constraintList = this.constraintList()
                 for (let index = 0; index < constraintList.length; index++) {
-                    const element = constraintList[index];
-                    let constraintStr = element.description()
-                    constraintStrList.push(constraintStr)
-                    console.log(constraintStr)
+                    if (constraintList.hasOwnProperty(index)) {
+                        const element = constraintList[index];
+                        let constraintStr = element.description()
+                        constraintStrList.push(constraintStr)
+                        console.log(constraintStr)
+                    }
                 }
             }
         }
@@ -141,9 +144,17 @@ function Constraint_lu(id_constraint) {
     this.constant = $("#" + id_constraint).attr("constant")
 
     this.description = function () {
-        let firstName = viewDic[this.firstItemID()].name()
-        let secondName = viewDic[this.secondItemID].name()
-        let des = firstName + '.' + this.firstAttribute + "Anchor.constraint.(equalTo:" + secondName + "." + this.secondAttribute + "Anchor, constant: " + this.constant + ").isActive = true"
-        return des
+        if (viewDic.hasOwnProperty(this.firstItemID()) && viewDic.hasOwnProperty(this.secondItemID)) {
+            let firstName = viewDic[this.firstItemID()].name()
+            let secondName = viewDic[this.secondItemID].name()
+            let des = firstName + '.' + this.firstAttribute + "Anchor.constraint(equalTo:" + secondName + "." + this.secondAttribute + "Anchor"
+            if (typeof(this.constant) == "undefined") {
+                des = des + ", constant: " + this.constant + ")"
+            } else {
+                des = des + ")"
+            }
+            des = des + ".isActive = true"
+            return des
+        }
     }
 }
