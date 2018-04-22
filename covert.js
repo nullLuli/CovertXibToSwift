@@ -8,14 +8,18 @@ const dom = new JSDOM(contentText)
 var $ = require("jquery")(dom.window)
 
 var viewDic = new Array()
+var viewNameIndex = 0
 
-let unionClassName = "view"
-let eleList = dom.window.document.querySelectorAll(unionClassName)
-for (let index = 0; index < eleList.length; index++) {
-    const element = eleList[index];
-    let elementID = $(element).attr("id")
-    let view = new View(elementID)
-    viewDic[elementID] = view
+let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch"]
+for (const index in unionClassNameList) {
+    let unionClassName = unionClassNameList[index]
+    let eleList = dom.window.document.querySelectorAll(unionClassName)
+    for (let index = 0; index < eleList.length; index++) {
+        const element = eleList[index];
+        let elementID = $(element).attr("id")
+        let view = new View(elementID)
+        viewDic[elementID] = view
+    }
 }
 
 for (const key in viewDic) {
@@ -35,21 +39,28 @@ function View(id_lu) {
         let elementName = $(selectNameString).attr("property")
         if (typeof (elementName) == "undefined") {
             //重名处理
+            if (this.nameIndex == 0)
+            {
+                this.nameIndex = viewNameIndex + 1
+                viewNameIndex = this.nameIndex
+            }
+            elementName = "view" + this.nameIndex
         }
         return elementName
     }
+    this.nameIndex = 0
     this.class_lu = function () {
-        let elementClass = $("#"+this.id_lu).attr("customClass")
+        let elementClass = $("#" + this.id_lu).attr("customClass")
         if (typeof (elementClass) == "undefined") {
             //使用默认class名称
-            let tagName = $(selectNameString).tagName
-            tagName = tagName.substring(0,1).toUpperCase()+tagName.substring(1);
+            let tagName = $("#" + this.id_lu)[0].tagName
+            tagName = tagName.substring(0, 1).toUpperCase() + tagName.substring(1);
             elementClass = "UI" + tagName
         }
         return elementClass
     }
     this.attributes = function () {
-        let attrList = $("#"+this.id_lu).attributes
+        let attrList = $("#" + this.id_lu).attributes
         var attrStringList = new Array(attrList.length)  //需要写入文件
         for (let index = 0; index < attrList.length; index++) {
             const attr = attrList.item(index)
@@ -65,34 +76,47 @@ function View(id_lu) {
         var constraintObjList = new Array(constraintList.length)
         for (let index = 0; index < constraintList.length; index++) {
             const constraint_lu = constraintList[index];
-            let constraintObj = Constraint_lu($(constraint_lu).attr("id"))
+            let constraintObj = new Constraint_lu($(constraint_lu).attr("id"))
             constraintObjList.push(constraintObj)
         }
         return constraintObjList
     }
 
     this.fatherViewName = function () {
-        let fatherEle = $("#"+this.id_lu).parentNode
+        let fatherEle = $("#" + this.id_lu).parent()
         let fatherEleID = $(fatherEle).attr("id")
+        if (typeof (fatherEleID) == "undefined") {
+            return
+        }
         let fatherView = viewDic[fatherEleID]
-        if (typeof(fatherView) == "undefined"){
-            return "fatherViewName"
+        if (typeof (fatherView) == "undefined") {
+            return
         }
         return fatherView.name()
     }
 
     this.description = function () {
-        let initViewString = 'let ' + this.name() + "= " + this.class_lu() + "()"
-        console.log(initViewString)
-        let addSubviewString = this.fatherViewName() + ".addsubview(" + this.name() + ")"
-        console.log(addSubviewString)
-        var constraintStrList = new Array()
-        let constraintList = this.constraintList()
-        for (let index = 0; index < constraintList.length; index++) {
-            const element = constraintList[index];
-            let constraintStr = element.description()
-            constraintStrList.push(constraintStr)
-            console.log(constraintStr)
+        if (typeof (this.name()) == "undefined") {
+            //重名处理
+            console.log("需要重名处理")
+        } else {
+            let initViewString = 'let ' + this.name() + " = " + this.class_lu() + "()"
+            console.log(initViewString)
+            if (typeof (this.fatherViewName()) == "undefined") {
+                //重名处理
+                console.log("father view需要特殊处理")
+            } else {
+                let addSubviewString = this.fatherViewName() + ".addsubview(" + this.name() + ")"
+                console.log(addSubviewString)
+                var constraintStrList = new Array()
+                let constraintList = this.constraintList()
+                for (let index = 0; index < constraintList.length; index++) {
+                    const element = constraintList[index];
+                    let constraintStr = element.description()
+                    constraintStrList.push(constraintStr)
+                    console.log(constraintStr)
+                }
+            }
         }
     }
 }
@@ -103,7 +127,7 @@ function Constraint_lu(id_constraint) {
         var firstItemID = $("#" + id_constraint).attr("firstItem")
         if (typeof (firstItemID) == "undefined") {
             //说明这个constrain是当前view的
-            let parentView = $("#" + id_constraint).parentNode
+            let parentView = $("#" + id_constraint).parent()
             firstItemID = $(parentView).attr("id")
             if (typeof (firstItemID) == "undefined") {
                 console.log("constraint还是没获取到firstItem id")
