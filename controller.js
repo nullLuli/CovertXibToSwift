@@ -26,7 +26,7 @@ exports.Controller = function ($, id_control) {
 
     this.viewNameIndex = 0
 
-    let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch", "tableViewCell", "tableView"] //可以根据Xcode中所有view来补全数组
+    let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch", "tableViewCell", "tableView", "tableViewCellContentView"] //可以根据Xcode中所有view来补全数组
     var viewDic = new Array()
     for (const index in unionClassNameList) {
         let unionClassName = unionClassNameList[index]
@@ -36,7 +36,7 @@ exports.Controller = function ($, id_control) {
             const element = viewList[index];
             let elementID = $(element).attr("id")
             var isRootView = false
-            if (elementID == this.rootViewID()) {
+            if (elementID == this.rootViewID) {
                 isRootView = true
             }
             let view = new ViewModule.View($, elementID, isRootView, this)
