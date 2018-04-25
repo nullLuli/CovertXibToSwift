@@ -35,16 +35,21 @@ exports.View = function ($, id_lu, isRootView, controller) {
         }
         return elementClass
     }
+
     this.attributes = function () {
         let attrList = this.$("#" + this.id_lu)[0].attributes
         if (typeof(attrList) == "undefined") {
             console.log("attr列表获取失败 id:" + this.id_lu)
         } else {
-            var attrStringList = new Array(attrList.length)  
+            var attrStringList = new Array()  
             for (let index = 0; index < attrList.length; index++) {
                 const attr = attrList.item(index)
-                let attrString = this.name() + "." + attr.name + " = " + attr.value
-                attrStringList.push(attrString)
+                if (attr.name == "id" || attr.name.indexOf("custom") >= 0) {
+                    console.log("attr被墙 attr.name:" + attr.name)
+                } else {
+                    let attrString = this.name() + "." + attr.name + " = " + attr.value
+                    attrStringList.push(attrString)
+                }
             }
             return attrStringList
         }
