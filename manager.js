@@ -7,6 +7,7 @@ const dom = new JSDOM(contentText)
 
 var $ = require("jquery")(dom.window)
 var NodeType = {Control: 1, View: 2, Attribute: 3, Mark: 4}
+
 console.log("getNameTest:" + getViewNameOf("Bpl-Ez-KjQ"))
 console.log("getNameTest:" + getViewNameOf("vVA-AO-dRw"))
 console.log("getNameTest:" + getViewNameOf("U4V-k2-OPR"))
@@ -53,19 +54,20 @@ function isControl(id_lu) {
 function getControlOf(id_lu) {
     //从给定ID找出ID所属control
     var controlID
-    var id_current = getNextID(id_lu)
+    var id_current = getParentID(id_lu)
     while (true) {
         if (isControl(id_current)) {
             controlID = id_current
             break
         }
-        id_current = getNextID(id_current)
+        id_current = getParentID(id_current)
     }
 
     return id_current
 }
 
-function getNextID(id_lu) {
+function getParentID(id_lu) {
+    //xml中会有没有ID的标签，此方法可以跳过没有ID的标签，直接找到上个有id的标签
     var parentNode = $("#" + id_lu)[0].parentNode
     var id_current = $(parentNode).attr("id")
     while (parentNode.tagName != "DOCUMENT") {
@@ -83,8 +85,7 @@ function getFatherViewIDOf(id_lu) {
     //返回值是数组，第一个参数是父node类型，第二个参数是父node ID
     let parentNode = $("#" + id_lu)[0].parentNode
     if (parentNode.tagName == "SUBVIEWS") {
-        parentNode = parentNode.parentNode
-        let parentID = $(parentNode).attr("id")
+        parentID = getParentID(id_lu)
         if (parentID != "undefined") {
             return [NodeType.View, parentID]
         } else {
