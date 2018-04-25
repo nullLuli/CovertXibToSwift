@@ -11,7 +11,7 @@
             "type": "node",
             "request": "launch",
             "name": "测试controller",
-            "program": "${workspaceFolder}/controller.js"
+            "program": "${workspaceFolder}/manager.js"
         }
     ]
 }
