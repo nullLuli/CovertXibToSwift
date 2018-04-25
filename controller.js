@@ -45,12 +45,19 @@ exports.Controller = function ($, id_control) {
     }
     this.viewDic = viewDic
 
-    for (const key in viewDic) {
-        if (viewDic.hasOwnProperty(key)) {
-            const element = viewDic[key];
-            // console.log(element)
-            console.log("------------------------------")
-            element.description()
+    this.description = function () {
+        var description = "\nfunc setupUI() {"
+        for (const key in this.viewDic) {
+            if (this.viewDic.hasOwnProperty(key)) {
+                const element = this.viewDic[key];
+                // console.log(element)
+                let des = element.description()
+                description = description + "\n\n" + des
+            }
         }
+        description = description + "\n" + "}"
+
+        return description
     }
+  
 }

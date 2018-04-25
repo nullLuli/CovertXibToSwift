@@ -68,7 +68,7 @@ exports.View = function ($, id_lu, isRootView, controller) {
             //父控件类型不在unionClassNameList
             //当成特殊控件来处理，用key来做父控件名
             let key = this.$("#" + fatherEleID).attr("key")
-            if (typeof (key) == "undefined") {
+            if (typeof(key) == "undefined") {
                 console.log("未收录控件，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
                 return
             } else {
@@ -91,19 +91,20 @@ exports.View = function ($, id_lu, isRootView, controller) {
     }
 
     this.description = function () {
+        var description
         if (typeof (this.name()) == "undefined") {
             //重名处理
             console.log("需要重名处理")
         } else {
             let initViewString = 'let ' + this.name() + " = " + this.class_lu() + "()"
-            console.log(initViewString)
+            description = "  " + description + "\n" + initViewString
             if (this.isRootView == false) {
                 if (typeof (this.fatherViewName()) == "undefined") {
                     //重名处理
                     console.log("father view需要特殊处理")
                 } else {
                     let addSubviewString = this.fatherViewName() + ".addsubview(" + this.name() + ")"
-                    console.log(addSubviewString)
+                    description = "  " + description + "\n" + addSubviewString
                 }
             }
             var constraintStrList = new Array()
@@ -113,10 +114,11 @@ exports.View = function ($, id_lu, isRootView, controller) {
                     const element = constraintList[index];
                     let constraintStr = element.description()
                     constraintStrList.push(constraintStr)
-                    console.log(constraintStr)
+                    description = "  " + description + "\n" + constraintStr
                 }
             }
         }
+        return description
     }
 }
 
@@ -170,7 +172,7 @@ function Constraint_lu($, id_constraint, controller) {
         }
 
         if (typeof (secondName) == "undefined") {
-            console.log("第二个对象处理不当 constraint ID：" + this.id_lu)
+            console.log("第二个对象处理不当   constraint ID：" + this.id_lu)
         }
     }
 

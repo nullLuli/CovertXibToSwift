@@ -22,8 +22,24 @@ for (let index = 0; index < unionControllerClassNameList.length; index++) {
         else
         {
             let controller = new controllerModule.Controller($,controlerID)
-            // console.log("*****************")
-            // controller.rootView()
+            // controller写入文件
+            let controllerClass = controller.class_lu()
+            if (typeof(controllerClass) == "undefined") {
+                console.log("controller class undefined id:" + controlerID)
+            } else {
+                let controllerFileName = controllerClass + ".swift"
+                var description = "class " + controllerClass + ": UIViewController {"
+                description = description + "\n func viewDidLoad() {\n  super.viewDidLoad()\n  setupUI()\n }"
+                description = description + controller.description()
+                description = description + "}"
+                fs.writeFileSync(controllerFileName, description,function(err) {
+                    if(err) {
+                        console.log(controllerClass + "写入错误")
+                        console.log(err);
+                    }
+                    console.log(controller.class_lu + " was saved!");
+                })
+            }
         }
     })
 }
