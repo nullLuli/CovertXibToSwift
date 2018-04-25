@@ -9,12 +9,17 @@ exports.View = function ($, id_lu, isRootView, controller) {
         let selectNameString = "outlet[destination$='" + this.id_lu + "']"
         let elementName = this.$(selectNameString).attr("property")
         if (typeof (elementName) == "undefined") {
-            //重名处理
-            if (this.nameIndex == 0) {
-                this.nameIndex = this.controller.viewNameIndex + 1
-                this.controller.viewNameIndex = this.nameIndex
+            if (this.controller.rootViewID == this.id_lu) {
+                //root view 无需重命名
+                elementName = "view"
+            } else {
+                //重名处理
+                if (this.nameIndex == 0) {
+                    this.nameIndex = this.controller.viewNameIndex + 1
+                    this.controller.viewNameIndex = this.nameIndex
+                }
+                elementName = "view" + this.nameIndex
             }
-            elementName = "view" + this.nameIndex
         }
         return elementName
     }
@@ -31,14 +36,18 @@ exports.View = function ($, id_lu, isRootView, controller) {
         return elementClass
     }
     this.attributes = function () {
-        let attrList = this.$("#" + this.id_lu).attributes
-        var attrStringList = new Array(attrList.length)  //需要写入文件
-        for (let index = 0; index < attrList.length; index++) {
-            const attr = attrList.item(index)
-            let attrString = elementName + "." + attr.name + " = " + attr.value
-            attrStringList.push(attrString)
+        let attrList = this.$("#" + this.id_lu)[0].attributes
+        if (typeof(attrList) == "undefined") {
+            console.log("attr列表获取失败 id:" + this.id_lu)
+        } else {
+            var attrStringList = new Array(attrList.length)  
+            for (let index = 0; index < attrList.length; index++) {
+                const attr = attrList.item(index)
+                let attrString = this.name() + "." + attr.name + " = " + attr.value
+                attrStringList.push(attrString)
+            }
+            return attrStringList
         }
-        return attrStringList
     }
     this.constraintList = function () {
         //找到所有ID相关的layout，然后生成
@@ -68,7 +77,7 @@ exports.View = function ($, id_lu, isRootView, controller) {
             //父控件类型不在unionClassNameList
             //当成特殊控件来处理，用key来做父控件名
             let key = this.$("#" + fatherEleID).attr("key")
-            if (typeof(key) == "undefined") {
+            if (typeof (key) == "undefined") {
                 console.log("未收录控件，控件ID：" + fatherEleID + "  行动子view ID：" + this.id_lu)
                 return
             } else {
@@ -91,14 +100,15 @@ exports.View = function ($, id_lu, isRootView, controller) {
     }
 
     this.description = function () {
-        var description
+        var description = ""
         if (typeof (this.name()) == "undefined") {
             //重名处理
             console.log("需要重名处理")
         } else {
-            let initViewString = 'let ' + this.name() + " = " + this.class_lu() + "()"
-            description = "  " + description + "\n" + initViewString
             if (this.isRootView == false) {
+                let initViewString = 'let ' + this.name() + " = " + this.class_lu() + "()"
+                description = initViewString
+
                 if (typeof (this.fatherViewName()) == "undefined") {
                     //重名处理
                     console.log("father view需要特殊处理")
@@ -107,6 +117,7 @@ exports.View = function ($, id_lu, isRootView, controller) {
                     description = "  " + description + "\n" + addSubviewString
                 }
             }
+
             var constraintStrList = new Array()
             let constraintList = this.constraintList()
             for (let index = 0; index < constraintList.length; index++) {
@@ -114,6 +125,17 @@ exports.View = function ($, id_lu, isRootView, controller) {
                     const element = constraintList[index];
                     let constraintStr = element.description()
                     constraintStrList.push(constraintStr)
+                    description = "  " + description + "\n" + constraintStr
+                }
+            }
+
+            //attri
+            let attributes = this.attributes()
+            if (typeof(attributes) == "undefined") {
+            } else {
+                console.log(attributes)
+                for (let index = 0; index < attributes.length; index++) {
+                    constraintStr = attributes[index]
                     description = "  " + description + "\n" + constraintStr
                 }
             }
