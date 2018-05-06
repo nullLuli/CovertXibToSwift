@@ -10,8 +10,14 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "测试controller",
+            "name": "测试manager",
             "program": "${workspaceFolder}/manager.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "测试plist",
+            "program": "${workspaceFolder}/manager5-6.js"
         }
     ]
 }
