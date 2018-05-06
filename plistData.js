@@ -1,6 +1,8 @@
 exports.PlistCenter = function (plist) {
     this.plist = plist
     var objects = plist["com.apple.ibtool.document.objects"]
+    var hierarchys = plist["com.apple.ibtool.document.hierarchy"]
+
     //生成ID-name表
     var name_ID_Dic = new Array()
     let connections = plist["com.apple.ibtool.document.connections"]
@@ -14,8 +16,14 @@ exports.PlistCenter = function (plist) {
     }
     this.name_ID_Dic = name_ID_Dic
 
+    //生成一张view层次图
+    for(var i = 0; i < hierarchys.length; i++) {
+        var hierarch = hierarchys[i]
+        var children = hierarch["children"]
+
+    }
+
     this.isCustomClassOf = function (id_lu) {
-        let objects = this.plist["com.apple.ibtool.document.objects"]
         let object = objects[id_lu]
         var objectClass = object["ibExternalCustomClassName"]
         if (typeof (objectClass) == "undefined") {
@@ -25,7 +33,7 @@ exports.PlistCenter = function (plist) {
     }
 
     this.getClassOf = function (id_lu) {
-        let object = objects[key]
+        let object = objects[id_lu]
         var objectClass = object["ibExternalCustomClassName"]
         if (typeof(objectClass) == "undefined") {
             objectClass = object["class"]
@@ -51,5 +59,27 @@ exports.PlistCenter = function (plist) {
         }
 
         return name
+    }
+
+    this.ObjectType = {Controller : "controller", View : "view", Constrain : "constrain", Other : "other"}
+
+    //IB中全部view类型
+    //不全待补 05-06
+    let viewClassArray = ["IBUILabel","IBUIButton","IBUITextField","IBUISlider","IBUISwitch","IBUIActivityIndicatorView","IBUIProgressView","IBUIPageControl","IBUIStepper","IBUIHorizontalStackView","IBUIVerticalStackView","IBUITableView","IBUITableViewCell","IBUIImageView","IBUICollectionView","IBUICollectionViewCell","IBUICollectionReuseableView","IBUITextView","IBUIScrollView","IBUIDatePicker","IBUIPickerView"]
+    //controller是全的
+    let controlClassArray = ["IBUIViewController","IBUINavigationController","IBUITableViewController","IBUICollectionViewController","IBUITabBarController","IBUISplitViewController","IBUIPageViewController","IBUIGLKitViewController","IBUIAVKitPlayerViewController"]
+    //手势
+    
+    this.getTypeOf = function(id_lu) {
+        let object = objects[id_lu]
+        var objectClass = object["class"]
+        if (viewClassArray.indexOf(objectClass) > 0) {
+            return this.ObjectType.View
+        } else if (controlClassArray.indexOf(objectClass) > 0) {
+            return this.ObjectType.Controller
+        } else if (objectClass == "IBLayoutConstraint") {
+            return this.ObjectType.Constrain
+        }
+        return this.ObjectType.Other
     }
 }

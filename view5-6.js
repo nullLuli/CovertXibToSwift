@@ -4,5 +4,7 @@ exports.View = function (id_lu, plistCenter) {
     this.plistCenter = plistCenter
     this.name = plistCenter.getNameOf(id_lu)
     this.class = plistCenter.getClassOf(id_lu)
+    // this.originClass
+    this.type = plistCenter.getTypeOf(id_lu)
     this.descript = this.name + "  " + this.class
 }
