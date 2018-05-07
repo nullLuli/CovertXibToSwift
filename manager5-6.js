@@ -18,42 +18,24 @@ exec(cmdStr, {
 
         var hierarchys = plist["com.apple.ibtool.document.hierarchy"]
 
-        var hieDic = new Array()
-        //生成一张view层次图
-        for (var i = 0; i < hierarchys.length; i++) {
-            var hierarch = hierarchys[i]
+        //遍历objects，生成view
+        let objects = plist["com.apple.ibtool.document.objects"]
+        for (key in objects) {
+            //首先是生成view代码
+            //需要获取view name、class name
 
-            let partHieDic = generateHierarchFrom(hierarch)
-            hieDic.concat(partHieDic)
-        }
-        console.log(hieDic)
+            //需要过滤constrain
+            let type = plistCenter.getTypeOf(key)
+            if (type == plistCenter.ObjectType.View) {
+                if (typeof(key) != "undefined") {
+                    let view = new ViewModule.View(key, plistCenter)
+                    console.log(view.descript)
+                } else {
+                    console.log("遍历object出现key是空的情况")
+                }
 
-        function generateHierarchFrom(hierarchy) {
-            var hieDic = new Array()
-            let curID = hierarchy["object-id"]
-            let children = hierarchy["children"]
-            if (typeof(children) != "undefined") {
-                for (var i = 0; i < children.length; i++) {
-                    let child = children[i]
-                    let childID = child["object-id"]
-                    hieDic[childID] = curID
-                    let hieDicOfChild = generateHierarchFrom(child)
-                    hieDic = hieDic.concat(hieDicOfChild)
-                }    
             }
-            
-            return hieDic
         }
-        // //遍历objects，生成view
-        // let objects = plist["com.apple.ibtool.document.objects"]
-        // for (key in objects) {
-        //     //首先是生成view代码
-        //     //需要获取view name、class name
-        //     let view = new ViewModule.View(key, plistCenter)            
-
-        //     //需要过滤constrain
-        //     console.log(view.descript)
-        // }
 
         function getNameOf(id_lu) {
             var name = name_ID_Dic[id_lu]
