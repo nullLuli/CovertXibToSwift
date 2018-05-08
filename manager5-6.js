@@ -15,6 +15,7 @@ exec(cmdStr, {
         var PlistCenterModule = require("/Users/nullluli/Desktop/luProject/CovertXibToSwift/plistData")
         var plistCenter = new PlistCenterModule.PlistCenter(plist)
         var ViewModule = require("/Users/nullluli/Desktop/luProject/CovertXibToSwift/view5-6")
+        var ConstraintModule = require("/Users/nullluli/Desktop/luProject/CovertXibToSwift/constraint")
 
         var hierarchys = plist["com.apple.ibtool.document.hierarchy"]
 
@@ -26,15 +27,23 @@ exec(cmdStr, {
 
             //需要过滤constrain
             let type = plistCenter.getTypeOf(key)
-            if (type == plistCenter.ObjectType.View) {
+            if (type == plistCenter.ObjectType.Constrain) {
                 if (typeof(key) != "undefined") {
-                    let view = new ViewModule.View(key, plistCenter)
-                    console.log(view.descript)
+                    let view = new ConstraintModule.Constraint(key, plistCenter)
+                    console.log(view.description)
                 } else {
                     console.log("遍历object出现key是空的情况")
                 }
-
-            }
+            } 
+            // if (type == plistCenter.ObjectType.View) {
+            //     // storyboard
+            //     if (typeof(key) != "undefined") {
+            //         let view = new ViewModule.View(key, plistCenter)
+            //         console.log(view.description)
+            //     } else {
+            //         console.log("遍历object出现key是空的情况")
+            //     }
+            // }
         }
 
         function getNameOf(id_lu) {
