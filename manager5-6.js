@@ -19,6 +19,17 @@ exec(cmdStr, {
 
         var hierarchys = plist["com.apple.ibtool.document.hierarchy"]
 
+        //想要生成层次，hierarchys是最合适的遍历格式
+        for (var i = 0; i < hierarchys.length; i++) {
+            var hierarch = hierarchys[i]
+            //最上层应该是controller
+            let id_lu = hierarch["object-id"]
+            let type = plistCenter.getTypeOf(id_lu)
+            if (type == plistCenter.ObjectType.Controller) {
+                //
+            }
+        }
+
         //遍历objects，生成view
         let objects = plist["com.apple.ibtool.document.objects"]
         for (key in objects) {

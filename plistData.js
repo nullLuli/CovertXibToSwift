@@ -1,11 +1,11 @@
 exports.PlistCenter = function (plist) {
     this.plist = plist
-    var objects = plist["com.apple.ibtool.document.objects"]
-    var hierarchys = plist["com.apple.ibtool.document.hierarchy"]
+    let objects = plist["com.apple.ibtool.document.objects"]
+    let hierarchys = plist["com.apple.ibtool.document.hierarchy"]
+    let connections = plist["com.apple.ibtool.document.connections"]
 
     //生成ID-name表
     var name_ID_Dic = new Array()
-    let connections = plist["com.apple.ibtool.document.connections"]
     for (connectionKey in connections) {
         let connection = connections[connectionKey]
         if (connection["type"] == "IBCocoaTouchOutletConnection") {
@@ -105,6 +105,30 @@ exports.PlistCenter = function (plist) {
         }
         return this.ObjectType.Other
     }
+    /*****************************controller相关方法***********************************/
+    this.getActionsOf = function (id_lu) {
+        //从connection里取
+        var arrOfConnection = []
+        let type = this.getTypeOf(id_lu)
+        if (type == this.ObjectType.Controller) {
+            for (key in connections) {
+                let connection = connections[key]
+                let desID = connection["destination-id"]
+                let connectionType = connection["type"]
+                if (desID == id_lu && connectionType == "IBCocoaTouchEventConnection") {
+                    arrOfConnection.push(connection)
+                }
+            }
+        } else {
+            console.log("不能controller，不能取action")
+        }
+        return arrOfConnection
+    }
+
+    this.getRootViewOf = function (id_lu) {
+        //hierarchys
+        
+    }
     /*****************************constraint相关方法***********************************/
     this.getConstraintItemNameOf = function (id_lu, isFirstItem) {
         let object = objects[id_lu]
@@ -126,7 +150,7 @@ exports.PlistCenter = function (plist) {
         } else if (typeOfItem == this.ObjectType.Constrain) {
             return "SomeConstrain"
         } else if (typeOfItem == this.ObjectType.LayoutGuide) {
-            return "view.safeAreaLayoutGuide"
+            return "view.layoutMarginsGuide"
         } else if (typeOfItem == this.ObjectType.Controller) {
             return "SomeController"
         } else {

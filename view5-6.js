@@ -4,7 +4,6 @@ exports.View = function (id_lu, plistCenter) {
     this.plistCenter = plistCenter
     this.name = plistCenter.getNameOf(id_lu)
     this.class = plistCenter.getClassOf(id_lu)
-    this.type = plistCenter.getTypeOf(id_lu)
     this.isSystemGenerate = plistCenter.isSystemGenerateOf(id_lu) //该view是否需要自己生成
 
     //descript
