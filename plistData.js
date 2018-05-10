@@ -116,7 +116,7 @@ exports.PlistCenter = function (plist) {
         }
         let itemObject = object[itemTagName]
         if (typeof(itemObject) == "undefined") {
-            return id_lu + " no " + itemTagName
+            return
         }
         let itemID = itemObject["ObjectID"]
         let typeOfItem = this.getTypeOf(itemID)

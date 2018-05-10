@@ -4,7 +4,7 @@ exports.Constraint = function(id_lu, plistCenter) {
 
     this.firstItemName = plistCenter.getConstraintItemNameOf(id_lu, true)
 
-    this.secondItemName = plistCenter.getConstraintItemNameOf(id_lu, false)
+    this.secondItemName = plistCenter.getConstraintItemNameOf(id_lu, false)//如果是width/height固定值就不会有second item
 
     this.firstAttribute = plistCenter.getConstraintAttriOf(id_lu, true)
 
@@ -17,24 +17,31 @@ exports.Constraint = function(id_lu, plistCenter) {
     //还要支持priority、relation
 
     var description 
-    if (typeof (this.firstItemName) != "undefined" && typeof (this.secondItemName) != "undefined") {
-        let des = this.firstItemName + '.' + this.firstAttribute + "Anchor.constraint(equalTo:" + this.secondItemName + "." + this.secondAttribute + "Anchor"
-        if (typeof (this.constant) == "undefined" || this.constant == '0') {
-            des = des + ")"
+    if (typeof (this.firstItemName) != "undefined") {
+        if (typeof (this.secondItemName) != "undefined") {
+            var des = this.firstItemName + '.' + this.firstAttribute + "Anchor.constraint(equalTo:" + this.secondItemName + "." + this.secondAttribute + "Anchor"
+            if (typeof (this.constant) == "undefined" || this.constant == '0') {
+                des = des + ")"
+            } else {
+                des = des + ", constant: " + this.constant + ")"
+            }
+            des = des + ".isActive = true"
         } else {
-            des = des + ", constant: " + this.constant + ")"
+            //检查是不是width/height恒等
+            if ((this.firstAttribute == "width" || this.firstAttribute == "height") && (typeof (this.constant) != "undefined") && this.constant != '0') {
+                //equalToConstant
+                var des = this.firstItemName + '.' + this.firstAttribute + "Anchor.constraint(equalToConstant: " + this.constant + ")"
+                des = des + ".isActive = true"
+            } else {
+                description = description + "第二个对象处理方式未知   constraint ID：" + this.id_lu
+            }
         }
-        des = des + ".isActive = true"
 
         description = des
     }
 
     if (typeof (this.firstItemName) == undefined) {
         description = description + "未取到first item constraint ID：" + this.id_lu
-    }
-
-    if (typeof (this.secondItemName) == "undefined") {
-        description = description + "第二个对象处理不当   constraint ID：" + this.id_lu
     }
 
     this.description = description
