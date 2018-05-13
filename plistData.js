@@ -26,8 +26,31 @@ exports.PlistCenter = function (plist) {
             hieDic[key] = partHieDic[key]
         }
     }
+    //生成一张可以根据ID查询归属controller的图
+    var controllerHieDic = []
+    for (var i = 0; i < hierarchys.length; i++) {
+        var hierarch = hierarchys[i]
+        let hieID = hierarch['object-id']
+
+        let allHieID = getAllHierarchIDFrom(hierarch)
+        controllerHieDic[hieID] = allHieID
+    }
+
     this.getFatherOf = function (id_lu) {
         return hieDic[id_lu]
+    }
+
+    this.getHieIDArrOf = function (id_lu) {
+        return controllerHieDic[id_lu]
+    }
+
+    this.getControlOf = function (id_lu) {
+        for (key in controllerHieDic) {
+            let array = controllerHieDic[key]
+            if (array.indexOf(id_lu) >= 0) {
+                return key
+            }
+        }
     }
 
     this.isCustomClassOf = function (id_lu) {
@@ -127,7 +150,28 @@ exports.PlistCenter = function (plist) {
 
     this.getRootViewOf = function (id_lu) {
         //hierarchys
-        
+        let type = this.getTypeOf(id_lu)
+        if (type == this.ObjectType.Controller) {
+            for (var i = 0; i < hierarchys.length; i++) {
+                var hierarch = hierarchys[i]
+                let hierarchID = hierarch["object-id"]
+                if (hierarchID == id_lu) {
+                    var children = hierarch["children"]
+                    for (var j = 0; j < children.length; j++) {
+                        var controlChild = children[i]
+                        let controlChildName = controlChild['label']
+                        let arrayOfBlack = ['Top Layout Guide', 'Bottom Layout Guide', 'Navigation Item']
+                        if (arrayOfBlack.indexOf(controlChildName) >= 0) {
+                            //不是rootview
+                        } else {
+                            return controlChild['object-id']
+                        }
+                    }
+
+                    break
+                }
+            }
+        }
     }
     /*****************************constraint相关方法***********************************/
     this.getConstraintItemNameOf = function (id_lu, isFirstItem) {
@@ -271,4 +315,43 @@ exports.PlistCenter = function (plist) {
         }
         return hieDicl
     }
+
+    function getAllHierarchIDFrom(hierarchy) {
+        var hieArr = []
+        let children = hierarchy["children"]
+        if (typeof(children) != "undefined") {
+            for (var i = 0; i < children.length; i++) {
+                let child = children[i]
+                let childID = child["object-id"]
+                hieArr.push(childID)
+                let allHieIDOfChild = getAllHierarchIDFrom(child)
+                hieArr = hieArr.concat(allHieIDOfChild)
+            }    
+        }
+
+        return hieArr
+    }
+
+       //生成一张可以根据ID查询constrain的图
+       var viewContrainDic = []
+       for (key in objects) {
+           let type = this.getTypeOf(key)
+           if (type == this.ObjectType.Constrain) {
+               if (typeof(key) != "undefined") {
+                   let firstItemID = objects[key]['firstItem']['ObjectID']
+                   var array = viewContrainDic[firstItemID]
+                   if (typeof(array) == 'undefined') {
+                       array = []
+                   }
+                   array.push(key)
+                   viewContrainDic[firstItemID] = array
+               } else {
+                   console.log("遍历object出现key是空的情况")
+               }
+           } 
+       }
+   
+       this.getConstraintOf = function (id_lu) {
+           return viewContrainDic[id_lu]
+       }
 }

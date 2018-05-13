@@ -7,16 +7,16 @@ exports.Action = function (dict, plistCenter) {
 
     var eventType = dict["event-type"]
     eventType.replace(/ /g, '')
-    eventType.dcfirst()
+    eventType = dcfirst(eventType)
     this.eventType = eventType
 
     var description
     description = this.sourceName + ".addTarget(self, action: #selector(" + this.destinationClassName + "." + this.actionName + "), for: ." + this.eventType + ")"
     this.description = description
- }
 
-function dcfirst(str) {
-    str = str.replace(/\b\w+\b/g, function (word) {  
-        return word.substring(0, 1).toLowerCase() + word.substring(1);
-    })
-}
+    function dcfirst(str) {
+        str = str.replace(/\b\w+\b/g, function (word) {  
+            return word.substring(0, 1).toLowerCase() + word.substring(1);
+        })
+    }
+ }
