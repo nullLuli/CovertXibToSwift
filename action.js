@@ -6,8 +6,13 @@ exports.Action = function (dict, plistCenter) {
     this.actionName = dict["label"]
 
     var eventType = dict["event-type"]
-    eventType.replace(/ /g, '')
-    eventType = dcfirst(eventType)
+    if (typeof(eventType) == 'undefined') {
+        console.log("需要处理手势 " + this.sourceID)
+        //手势处理。
+    } else {
+        eventType.replace(/ /g, '')
+        eventType = dcfirst(eventType)
+    }
     this.eventType = eventType
 
     var description

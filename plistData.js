@@ -116,17 +116,21 @@ exports.PlistCenter = function (plist) {
     
     this.getTypeOf = function(id_lu) {
         let object = objects[id_lu]
-        var objectClass = object["class"]
-        if (viewClassArray.indexOf(objectClass) >= 0) {
-            return this.ObjectType.View
-        } else if (controlClassArray.indexOf(objectClass) >= 0) {
-            return this.ObjectType.Controller
-        } else if (objectClass == "IBLayoutConstraint") {
-            return this.ObjectType.Constrain
-        } else if (objectClass == "IBUIViewControllerAutolayoutGuide") {
-            return this.ObjectType.LayoutGuide
-        }
-        return this.ObjectType.Other
+        // if (typeof(object) != 'undefined'){
+            var objectClass = object["class"]
+            if (viewClassArray.indexOf(objectClass) >= 0) {
+                return this.ObjectType.View
+            } else if (controlClassArray.indexOf(objectClass) >= 0) {
+                return this.ObjectType.Controller
+            } else if (objectClass == "IBLayoutConstraint") {
+                return this.ObjectType.Constrain
+            } else if (objectClass == "IBUIViewControllerAutolayoutGuide") {
+                return this.ObjectType.LayoutGuide
+            }
+            return this.ObjectType.Other
+        // } else {
+        //     return this.ObjectType.Other
+        // }
     }
     /*****************************controller相关方法***********************************/
     this.getActionsOf = function (id_lu) {

@@ -34,6 +34,11 @@ exports.Controller = function (id_lu, plistCenter) {
         let viewDes = view.description
         description = description + '\n\n' + viewDes
     }
+    for (var i = 0; i < actionArr.length; i++) {
+        let action = actionArr[i]
+        let actionDes = action.description
+        description = description + '\n' + actionDes
+    }
     description = description + "}\n\n\n"
 
     this.description = description
