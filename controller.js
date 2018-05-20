@@ -1,63 +1,45 @@
-var ViewModule = require("/Users/nullluli/Desktop/luProject/CovertXibToSwift/view")
+exports.Controller = function (id_lu, plistCenter) {
+    this.id_lu = id_lu
+    this.name = plistCenter.getNameOf(id_lu)
+    this.class = plistCenter.getClassOf(id_lu)
+    this.type = plistCenter.getTypeOf(id_lu)
 
-exports.Controller = function ($, id_control) {
-    this.$ = $
-    this.id_lu = id_control
-    this.class_lu = function () {
-        let elementClass = this.$("#" + this.id_lu).attr("customClass")
-        if (typeof (elementClass) == "undefined") {
-            //使用默认class名称
-            let tagName = this.$("#" + this.id_lu)[0].tagName
-            tagName = tagName.toLowerCase()
-            tagName = tagName.substring(0, 1).toUpperCase() + tagName.substring(1);
-            elementClass = "UI" + tagName
-        }
-        return elementClass
+    //action
+    let ActionModule = require("./action")
+    let actionDicArr = plistCenter.getActionsOf(id_lu)
+    var actionArr = []
+    for (var i = 0; i < actionDicArr.length; i++) {
+        let actionDic = actionDicArr[i]
+        let action = new ActionModule.Action(actionDic, plistCenter)
+        actionArr.push(action)
     }
+    this.actionArr = actionArr
 
-    //tableViewController
-    //解析出controller root view标签名
-    let tagName = this.$("#" + this.id_lu)[0].tagName
-    let rootViewTagName = tagName.substring(0, tagName.length - 10)
-    let rootView = this.$("#" + this.id_lu).children(rootViewTagName)
-    let rootViewID = this.$(rootView).attr("id")
-
-    this.rootViewID = rootViewID
-
-    this.viewNameIndex = 0
-
-    let unionClassNameList = ["view", "button", "textField", "label", "imageView", "switch", "tableViewCell", "tableView", "tableViewCellContentView"] //可以根据Xcode中所有view来补全数组
-    var viewDic = new Array()
-    for (const index in unionClassNameList) {
-        let unionClassName = unionClassNameList[index]
-        let upUnionClassName = unionClassName.toUpperCase()
-        let viewList = this.$("#" + this.id_lu).find(upUnionClassName)
-        for (let index = 0; index < viewList.length; index++) {
-            const element = viewList[index];
-            let elementID = $(element).attr("id")
-            var isRootView = false
-            if (elementID == this.rootViewID) {
-                isRootView = true
-            }
-            let view = new ViewModule.View($, elementID, isRootView, this)
-            viewDic[elementID] = view
+    var ViewModule = require("./view")
+    var viewArr = []
+    let viewIDArr = plistCenter.getHieIDArrOf(id_lu)
+    for (var i = 0; i < viewIDArr.length; i++) {
+        let viewID = viewIDArr[i]
+        let type = plistCenter.getTypeOf(viewID)
+        if (type == plistCenter.ObjectType.View) {
+            let view = new ViewModule.View(viewID, plistCenter)
+            viewArr.push(view)
         }
     }
-    this.viewDic = viewDic
+    this.viewArr = viewArr
 
-    this.description = function () {
-        var description = "\nfunc setupUI() {"
-        for (const key in this.viewDic) {
-            if (this.viewDic.hasOwnProperty(key)) {
-                const element = this.viewDic[key];
-                // console.log(element)
-                let des = element.description()
-                description = description + "\n\n" + des
-            }
-        }
-        description = description + "\n" + "}"
-
-        return description
+    var description = this.class + " : {\n"
+    for (var i = 0; i < viewArr.length; i++) {
+        let view = viewArr[i]
+        let viewDes = view.description
+        description = description + '\n\n' + viewDes
     }
-  
+    for (var i = 0; i < actionArr.length; i++) {
+        let action = actionArr[i]
+        let actionDes = action.description
+        description = description + '\n' + actionDes
+    }
+    description = description + "}\n\n\n"
+
+    this.description = description
 }

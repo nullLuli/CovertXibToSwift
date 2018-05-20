@@ -65,7 +65,7 @@ exports.PlistCenter = function (plist) {
     this.getClassOf = function (id_lu) {
         let object = objects[id_lu]
         var objectClass = object["ibExternalCustomClassName"]
-        if (typeof(objectClass) == "undefined") {
+        if (typeof (objectClass) == "undefined") {
             objectClass = object["class"]
             objectClass = objectClass.substring(2, objectClass.length)
         }
@@ -76,7 +76,7 @@ exports.PlistCenter = function (plist) {
     this.getNameOf = function (id_lu) {
         var name = this.name_ID_Dic[id_lu]
 
-        if(typeof(id_lu) == 'undefined') {
+        if (typeof (id_lu) == 'undefined') {
             console.log("get name of id 出现空")
         }
         if (typeof (name) == "undefined") {
@@ -104,33 +104,38 @@ exports.PlistCenter = function (plist) {
         return name
     }
 
-    this.ObjectType = {Controller : "Controller", View : "View", Constrain : "Constrain", LayoutGuide : "LayoutGuide", Other : "Other"}
+    this.ObjectType = {
+        Controller: "Controller",
+        View: "View",
+        Constrain: "Constrain",
+        LayoutGuide: "LayoutGuide",
+        SafeAreaGuide: "SafeAreaGuide", //view的guide，自动定义为safe area guide
+        Other: "Other"
+    }
 
 
     //IB中全部view类型
     //不全待补 05-06
-    let viewClassArray = ["IBUILabel","IBUIButton","IBUITextField","IBUISlider","IBUISwitch","IBUIActivityIndicatorView","IBUIProgressView","IBUIPageControl","IBUIStepper","IBUIHorizontalStackView","IBUIVerticalStackView","IBUITableView","IBUITableViewCell","IBUIImageView","IBUICollectionView","IBUICollectionViewCell","IBUICollectionReuseableView","IBUITextView","IBUIScrollView","IBUIDatePicker","IBUIPickerView","IBUIVisualEffectView","IBMKMapView","IBMTKView","IBGLKView","IBUIWebView","IBUINavigationBar","IBUINavigationItem","IBUIToolbar","IBUIBarButtonItem","IBUITabBar","IBUITabBarItem","IBUISearchBar","IBUIView","IBUIContainerView","IBUITableViewCellContentView"]
+    let viewClassArray = ["IBUILabel", "IBUIButton", "IBUITextField", "IBUISlider", "IBUISwitch", "IBUIActivityIndicatorView", "IBUIProgressView", "IBUIPageControl", "IBUIStepper", "IBUIHorizontalStackView", "IBUIVerticalStackView", "IBUITableView", "IBUITableViewCell", "IBUIImageView", "IBUICollectionView", "IBUICollectionViewCell", "IBUICollectionReuseableView", "IBUITextView", "IBUIScrollView", "IBUIDatePicker", "IBUIPickerView", "IBUIVisualEffectView", "IBMKMapView", "IBMTKView", "IBGLKView", "IBUIWebView", "IBUINavigationBar", "IBUINavigationItem", "IBUIToolbar", "IBUIBarButtonItem", "IBUITabBar", "IBUITabBarItem", "IBUISearchBar", "IBUIView", "IBUIContainerView", "IBUITableViewCellContentView","IBUISegmentedControl","IBUIPageControl"]
     //controller是全的
-    let controlClassArray = ["IBUIViewController","IBUINavigationController","IBUITableViewController","IBUICollectionViewController","IBUITabBarController","IBUISplitViewController","IBUIPageViewController","IBUIGLKitViewController","IBUIAVKitPlayerViewController"]
+    let controlClassArray = ["IBUIViewController", "IBUINavigationController", "IBUITableViewController", "IBUICollectionViewController", "IBUITabBarController", "IBUISplitViewController", "IBUIPageViewController", "IBUIGLKitViewController", "IBUIAVKitPlayerViewController"]
     //手势
-    
-    this.getTypeOf = function(id_lu) {
+
+    this.getTypeOf = function (id_lu) {
         let object = objects[id_lu]
-        // if (typeof(object) != 'undefined'){
-            var objectClass = object["class"]
-            if (viewClassArray.indexOf(objectClass) >= 0) {
-                return this.ObjectType.View
-            } else if (controlClassArray.indexOf(objectClass) >= 0) {
-                return this.ObjectType.Controller
-            } else if (objectClass == "IBLayoutConstraint") {
-                return this.ObjectType.Constrain
-            } else if (objectClass == "IBUIViewControllerAutolayoutGuide") {
-                return this.ObjectType.LayoutGuide
-            }
-            return this.ObjectType.Other
-        // } else {
-        //     return this.ObjectType.Other
-        // }
+        var objectClass = object["class"]
+        if (viewClassArray.indexOf(objectClass) >= 0) {
+            return this.ObjectType.View
+        } else if (controlClassArray.indexOf(objectClass) >= 0) {
+            return this.ObjectType.Controller
+        } else if (objectClass == "IBLayoutConstraint") {
+            return this.ObjectType.Constrain
+        } else if (objectClass == "IBUIViewControllerAutolayoutGuide") {
+            return this.ObjectType.LayoutGuide
+        } else if (objectClass == "IBUIViewAutolayoutGuide") {
+            return this.ObjectType.SafeAreaGuide
+        }
+        return this.ObjectType.Other
     }
     /*****************************controller相关方法***********************************/
     this.getActionsOf = function (id_lu) {
@@ -187,7 +192,7 @@ exports.PlistCenter = function (plist) {
             itemTagName = "secondItem"
         }
         let itemObject = object[itemTagName]
-        if (typeof(itemObject) == "undefined") {
+        if (typeof (itemObject) == "undefined") {
             return
         }
         let itemID = itemObject["ObjectID"]
@@ -199,10 +204,14 @@ exports.PlistCenter = function (plist) {
             return "SomeConstrain"
         } else if (typeOfItem == this.ObjectType.LayoutGuide) {
             return "view.layoutMarginsGuide"
+        } else if (typeOfItem == this.ObjectType.SafeAreaGuide) {
+            return "self.safeAreaLayoutGuide"
         } else if (typeOfItem == this.ObjectType.Controller) {
             return "SomeController"
         } else {
-            return "UnknowType" + id_lu + objectClass
+            let object = objects[itemID]
+            var objectClass = object["class"]
+            return "UnknowType" + itemID + objectClass
         }
     }
 
@@ -253,9 +262,11 @@ exports.PlistCenter = function (plist) {
     /*****************************view相关方法***********************************/
     this.isRootViewOf = function (id_lu) {
         let id_father = this.getFatherOf(id_lu)
-        let fatherType = this.getTypeOf(id_father)
-        if (fatherType == this.ObjectType.Controller) {
-            return true
+        if (typeof (id_father) != "undefined") {
+            let fatherType = this.getTypeOf(id_father)
+            if (fatherType == this.ObjectType.Controller) {
+                return true
+            }
         }
         return false
     }
@@ -298,7 +309,7 @@ exports.PlistCenter = function (plist) {
         while (this.isInvisibleMiddleViewOf(fatherID)) {
             //
         }
-        
+
     }
 
     //私有方法
@@ -306,7 +317,7 @@ exports.PlistCenter = function (plist) {
         var hieDicl = []
         let curID = hierarchy["object-id"]
         let children = hierarchy["children"]
-        if (typeof(children) != "undefined") {
+        if (typeof (children) != "undefined") {
             for (var i = 0; i < children.length; i++) {
                 let child = children[i]
                 let childID = child["object-id"]
@@ -315,7 +326,7 @@ exports.PlistCenter = function (plist) {
                 for (key in hieDicOfChild) {
                     hieDicl[key] = hieDicOfChild[key]
                 }
-            }    
+            }
         }
         return hieDicl
     }
@@ -323,39 +334,39 @@ exports.PlistCenter = function (plist) {
     function getAllHierarchIDFrom(hierarchy) {
         var hieArr = []
         let children = hierarchy["children"]
-        if (typeof(children) != "undefined") {
+        if (typeof (children) != "undefined") {
             for (var i = 0; i < children.length; i++) {
                 let child = children[i]
                 let childID = child["object-id"]
                 hieArr.push(childID)
                 let allHieIDOfChild = getAllHierarchIDFrom(child)
                 hieArr = hieArr.concat(allHieIDOfChild)
-            }    
+            }
         }
 
         return hieArr
     }
 
-       //生成一张可以根据ID查询constrain的图
-       var viewContrainDic = []
-       for (key in objects) {
-           let type = this.getTypeOf(key)
-           if (type == this.ObjectType.Constrain) {
-               if (typeof(key) != "undefined") {
-                   let firstItemID = objects[key]['firstItem']['ObjectID']
-                   var array = viewContrainDic[firstItemID]
-                   if (typeof(array) == 'undefined') {
-                       array = []
-                   }
-                   array.push(key)
-                   viewContrainDic[firstItemID] = array
-               } else {
-                   console.log("遍历object出现key是空的情况")
-               }
-           } 
-       }
-   
-       this.getConstraintOf = function (id_lu) {
-           return viewContrainDic[id_lu]
-       }
+    //生成一张可以根据ID查询constrain的图
+    var viewContrainDic = []
+    for (key in objects) {
+        let type = this.getTypeOf(key)
+        if (type == this.ObjectType.Constrain) {
+            if (typeof (key) != "undefined") {
+                let firstItemID = objects[key]['firstItem']['ObjectID']
+                var array = viewContrainDic[firstItemID]
+                if (typeof (array) == 'undefined') {
+                    array = []
+                }
+                array.push(key)
+                viewContrainDic[firstItemID] = array
+            } else {
+                console.log("遍历object出现key是空的情况")
+            }
+        }
+    }
+
+    this.getConstraintOf = function (id_lu) {
+        return viewContrainDic[id_lu]
+    }
 }
