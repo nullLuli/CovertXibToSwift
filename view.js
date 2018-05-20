@@ -32,7 +32,7 @@ exports.View = function (id_lu, plistCenter) {
             console.log(id_lu + "没有father ID")
         }
     } else {
-        console.log("该view不需要自己生成 ：" + this.isSystemGenerate)
+        console.log("该view不需要自己生成 ：" + this.isSystemGenerate + "  id : " + id_lu )
     }
     for (var i = 0; i < constraintArr.length; i++) {
         description = description + constraintArr[i].description + "\n"

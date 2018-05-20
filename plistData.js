@@ -117,7 +117,7 @@ exports.PlistCenter = function (plist) {
 
     //IB中全部view类型
     //不全待补 05-06
-    let viewClassArray = ["IBUILabel", "IBUIButton", "IBUITextField", "IBUISlider", "IBUISwitch", "IBUIActivityIndicatorView", "IBUIProgressView", "IBUIPageControl", "IBUIStepper", "IBUIHorizontalStackView", "IBUIVerticalStackView", "IBUITableView", "IBUITableViewCell", "IBUIImageView", "IBUICollectionView", "IBUICollectionViewCell", "IBUICollectionReuseableView", "IBUITextView", "IBUIScrollView", "IBUIDatePicker", "IBUIPickerView", "IBUIVisualEffectView", "IBMKMapView", "IBMTKView", "IBGLKView", "IBUIWebView", "IBUINavigationBar", "IBUINavigationItem", "IBUIToolbar", "IBUIBarButtonItem", "IBUITabBar", "IBUITabBarItem", "IBUISearchBar", "IBUIView", "IBUIContainerView", "IBUITableViewCellContentView","IBUISegmentedControl","IBUIPageControl"]
+    let viewClassArray = ["IBUILabel", "IBUIButton", "IBUITextField", "IBUISlider", "IBUISwitch", "IBUIActivityIndicatorView", "IBUIProgressView", "IBUIPageControl", "IBUIStepper", "IBUIHorizontalStackView", "IBUIVerticalStackView", "IBUITableView", "IBUITableViewCell", "IBUIImageView", "IBUICollectionView", "IBUICollectionViewCell", "IBUICollectionReuseableView", "IBUITextView", "IBUIScrollView", "IBUIDatePicker", "IBUIPickerView", "IBUIVisualEffectView", "IBMKMapView", "IBMTKView", "IBGLKView", "IBUIWebView", "IBUINavigationBar", "IBUINavigationItem", "IBUIToolbar", "IBUIBarButtonItem", "IBUITabBar", "IBUITabBarItem", "IBUISearchBar", "IBUIView", "IBUIContainerView", "IBUITableViewCellContentView", "IBUISegmentedControl", "IBUIPageControl"]
     //controller是全的
     let controlClassArray = ["IBUIViewController", "IBUINavigationController", "IBUITableViewController", "IBUICollectionViewController", "IBUITabBarController", "IBUISplitViewController", "IBUIPageViewController", "IBUIGLKitViewController", "IBUIAVKitPlayerViewController"]
     //手势
@@ -283,6 +283,10 @@ exports.PlistCenter = function (plist) {
             if (isRootView == true) {
                 return true
             } else {
+                let id_father = this.getFatherOf(id_lu)
+                if (typeof (id_father) == "undefined") {
+                    return true
+                }
                 let className = this.getClassOf(id_lu)
                 if (systemGenViewClassArray.indexOf(className) >= 0) {
                     return true
