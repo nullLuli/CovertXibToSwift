@@ -95,6 +95,7 @@ exports.PlistCenter = function (plist) {
                 name = objectClass.toLowerCase() + objectID.toLowerCase()
             } else {
                 let prefix = objectClass.substring(2, objectClass.length)
+                prefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1, prefix.length)
                 name = prefix + objectID
             }
 

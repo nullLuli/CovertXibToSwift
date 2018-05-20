@@ -1,7 +1,7 @@
 var exec = require('child_process').exec
 
 var dom
-var cmdStr = 'ibtool /Users/nullluli/Desktop/View.xib --objects --connections --hierarchy'
+var cmdStr = 'ibtool ./View.xib --objects --connections --hierarchy'
 ///path/to/xibOrStroyborad
 exec(cmdStr, {
     encoding: 'utf8',
