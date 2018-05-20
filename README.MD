@@ -3,8 +3,8 @@
 ## 使用
 *tip：需要node环境，node环境安装自行百度*
 
-下载CovertXibToSwift工程
-将manager.js文件中的“./View.xib”改成自己的目标xib或者storyboard地址
+下载CovertXibToSwift工程  
+将manager.js文件中的“./View.xib”改成自己的目标xib或者storyboard地址  
 使用node命令运行manager.js，如下
 ```
 node /path/to/manager.js
